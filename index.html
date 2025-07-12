@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Lightweight Charts 演示</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="./libs/lightweight-charts.js"></script>
+    <script src="./libs/talib-web.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>TradingView Lightweight Charts 功能演示</h1>
+            <p class="subtitle">体验专业级金融图表的强大功能</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="candlestick">蜡烛图</button>
+            <button class="tab-btn" data-tab="line">线图</button>
+            <button class="tab-btn" data-tab="area">面积图</button>
+            <button class="tab-btn" data-tab="histogram">柱状图</button>
+            <button class="tab-btn" data-tab="realtime">实时数据</button>
+            <button class="tab-btn" data-tab="indicators">技术指标</button>
+        </nav>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>时间周期:</label>
+                <select id="timeframe">
+                    <option value="1m">1分钟</option>
+                    <option value="5m">5分钟</option>
+                    <option value="15m">15分钟</option>
+                    <option value="1h" selected>1小时</option>
+                    <option value="4h">4小时</option>
+                    <option value="1d">1天</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>交易对:</label>
+                <select id="symbol">
+                    <option value="BTCUSDT" selected>BTC/USDT</option>
+                    <option value="ETHUSDT">ETH/USDT</option>
+                    <option value="AAPL">AAPL</option>
+                    <option value="TSLA">TSLA</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button id="resetZoom" class="btn">重置缩放</button>
+                <button id="toggleCrosshair" class="btn">切换十字线</button>
+                <button id="toggleGrid" class="btn">切换网格</button>
+            </div>
+
+            <!-- 技术指标控制面板 -->
+            <div class="control-group indicators-panel">
+                <h4>📊 技术指标</h4>
+                <div class="indicator-buttons">
+                    <button id="addSMA20" class="btn indicator-btn">SMA(20)</button>
+                    <button id="addSMA50" class="btn indicator-btn">SMA(50)</button>
+                    <button id="addEMA12" class="btn indicator-btn">EMA(12)</button>
+                    <button id="addRSI" class="btn indicator-btn">RSI(14)</button>
+                    <button id="addBB" class="btn indicator-btn">布林带</button>
+                    <button id="clearIndicators" class="btn btn-danger">清除指标</button>
+                </div>
+                <div class="indicator-status">
+                    <span id="indicatorCount">当前指标: 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div id="chart" class="chart"></div>
+            <div class="chart-info">
+                <div class="price-info">
+                    <span class="current-price">--</span>
+                    <span class="price-change">--</span>
+                </div>
+                <div class="volume-info">
+                    <span>成交量: <span class="current-volume">--</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-showcase">
+            <div class="feature-card">
+                <h3>🕯️ 专业蜡烛图</h3>
+                <p>支持OHLC数据显示，完美呈现价格走势</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 多种图表类型</h3>
+                <p>线图、面积图、柱状图等多种可视化方式</p>
+            </div>
+            <div class="feature-card">
+                <h3>⚡ 高性能渲染</h3>
+                <p>支持大量数据点，流畅的缩放和平移</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎯 实时数据</h3>
+                <p>支持实时数据更新和动态图表</p>
+            </div>
+            <div class="feature-card">
+                <h3>📈 技术指标</h3>
+                <p>移动平均线、成交量等专业技术分析工具</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎨 高度定制</h3>
+                <p>主题、颜色、样式完全可定制</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>基于 TradingView Lightweight Charts 构建 | 开源免费 | 仅35KB</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
