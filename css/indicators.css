@@ -1,0 +1,68 @@
+/* 技术指标控制面板样式 */
+.indicators-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.indicators-panel h4 {
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.indicator-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.indicator-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.indicator-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.indicator-btn:active {
+    transform: translateY(0);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52) !important;
+    border: none !important;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #ff5252, #e53935) !important;
+}
+
+.indicator-status {
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 8px;
+}
+
+.indicator-status span {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
+} 

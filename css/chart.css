@@ -1,0 +1,40 @@
+.chart-container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.legend {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    color: #333;
+    pointer-events: none; /* So it doesn't interfere with chart interactions */
+}
+
+.legend div {
+    margin-bottom: 4px;
+}
+
+.legend .value {
+    color: #000;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.chart {
+    height: 500px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chart {
+        height: 400px;
+    }
+} 
