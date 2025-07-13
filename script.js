@@ -5,6 +5,7 @@ let lineSeries;
 let areaSeries;
 let histogramSeries;
 let volumeSeries;
+let legendElement;
 let currentTab = 'candlestick';
 let isRealtime = false;
 let realtimeInterval;
@@ -22,6 +23,7 @@ let activeIndicators = new Set(); // 当前激活的指标
 // 初始化图表
 function initChart() {
     const chartContainer = document.getElementById('chart');
+    legendElement = document.getElementById('legend');
 
     if (!chartContainer) {
         console.error('Chart container not found');
@@ -61,6 +63,8 @@ function initChart() {
             secondsVisible: false,
         },
     });
+
+        chart.subscribeCrosshairMove(updateLegend);
 
         // 响应式处理
         window.addEventListener('resize', () => {
@@ -161,7 +165,7 @@ function initCandlestickChart() {
     const volumeData = generateSampleData('histogram');
     volumeSeries.setData(volumeData);
     
-    updatePriceInfo(candleDataGlobal[candleDataGlobal.length - 1]);
+    updateLegend();
 }
 
 // 初始化线图
@@ -176,7 +180,7 @@ function initLineChart() {
     const data = generateSampleData('line');
     lineSeries.setData(data);
     
-    updatePriceInfo(data[data.length - 1]);
+    updateLegend();
 }
 
 // 初始化面积图
@@ -193,7 +197,7 @@ function initAreaChart() {
     const data = generateSampleData('area');
     areaSeries.setData(data);
     
-    updatePriceInfo(data[data.length - 1]);
+    updateLegend();
 }
 
 // 初始化柱状图
@@ -241,29 +245,89 @@ function clearChart() {
     }
 }
 
-// 更新价格信息
-function updatePriceInfo(data) {
-    const priceElement = document.querySelector('.current-price');
-    const changeElement = document.querySelector('.price-change');
-    const volumeElement = document.querySelector('.current-volume');
+// 更新图例
+function updateLegend(param) {
+    const legend = legendElement;
+    if (!legend) return;
+
+    let html = '';
+    const symbol = document.getElementById('symbol')?.value || 'BTC/USDT';
+    const timeframe = document.getElementById('timeframe')?.options[document.getElementById('timeframe').selectedIndex]?.text || '1H';
     
-    // 重置 change class
-    changeElement.className = 'price-change';
-    
-    if (data && data.close !== undefined) {
-        priceElement.textContent = `$${data.close.toLocaleString()}`;
-        const change = ((data.close - data.open) / data.open * 100).toFixed(2);
-        changeElement.textContent = `${change > 0 ? '+' : ''}${change}%`;
-        changeElement.classList.add(change >= 0 ? 'positive' : 'negative');
-    } else if (data && data.value !== undefined) {
-        priceElement.textContent = `$${data.value.toLocaleString()}`;
-        changeElement.textContent = '+0.00%';
-    } else {
-        priceElement.textContent = '--';
-        changeElement.textContent = '--';
+    html += `<div><strong>${symbol}</strong>, ${timeframe}</div>`;
+
+    // Case 1: Crosshair is moving on the chart
+    if (param && param.time && param.seriesData) {
+        let mainSeriesData = null;
+        if (candlestickSeries && param.seriesData.has(candlestickSeries)) {
+            mainSeriesData = param.seriesData.get(candlestickSeries);
+            html += `<div>O:<span class="value">${mainSeriesData.open.toFixed(2)}</span> H:<span class="value">${mainSeriesData.high.toFixed(2)}</span> L:<span class="value">${mainSeriesData.low.toFixed(2)}</span> C:<span class="value">${mainSeriesData.close.toFixed(2)}</span></div>`;
+        } else if (lineSeries && param.seriesData.has(lineSeries)) {
+            mainSeriesData = param.seriesData.get(lineSeries);
+            html += `<div>Value: <span class="value">${mainSeriesData.value.toFixed(2)}</span></div>`;
+        } else if (areaSeries && param.seriesData.has(areaSeries)) {
+            mainSeriesData = param.seriesData.get(areaSeries);
+            html += `<div>Value: <span class="value">${mainSeriesData.value.toFixed(2)}</span></div>`;
+        }
+
+        if (mainSeriesData) {
+             for (const [id, indicatorInfo] of indicatorSeries.entries()) {
+                if (Array.isArray(indicatorInfo.series)) { // For multi-series indicators like Bollinger Bands
+                    indicatorInfo.series.forEach(s => {
+                        if (param.seriesData.has(s)) {
+                            const indicatorValue = param.seriesData.get(s).value;
+                            const title = s.options().title;
+                            html += `<div style="color: ${s.options().color}">${title}: ${indicatorValue.toFixed(2)}</div>`;
+                        }
+                    });
+                } else { // For single-series indicators
+                    const s = indicatorInfo.series;
+                    if (s && param.seriesData.has(s)) {
+                        const indicatorValue = param.seriesData.get(s).value;
+                        const title = s.options().title;
+                        html += `<div style="color: ${s.options().color}">${title}: ${indicatorValue.toFixed(2)}</div>`;
+                    }
+                }
+            }
+        } else {
+            legend.innerHTML = ''; // Clear legend if cursor is not over a main series data point
+            return;
+        }
+
+    } 
+    // Case 2: No crosshair move, show latest data point
+    else {
+        let lastData = null;
+        if (currentTab === 'candlestick' && candleDataGlobal.length > 0) {
+            lastData = candleDataGlobal[candleDataGlobal.length - 1];
+            html += `<div>O:<span class="value">${lastData.open.toFixed(2)}</span> H:<span class="value">${lastData.high.toFixed(2)}</span> L:<span class="value">${lastData.low.toFixed(2)}</span> C:<span class="value">${lastData.close.toFixed(2)}</span></div>`;
+            
+            // Show latest indicator values
+            for (const [id, indicatorInfo] of indicatorSeries.entries()) {
+                if (indicatorInfo.data) {
+                     if (Array.isArray(indicatorInfo.series)) { // Bollinger Bands
+                        const upperData = indicatorInfo.data.upper;
+                        const middleData = indicatorInfo.data.middle;
+                        const lowerData = indicatorInfo.data.lower;
+                        if(upperData && upperData.length > 0) {
+                             html += `<div style="color: ${indicatorInfo.series[0].options().color}">${indicatorInfo.series[0].options().title}: ${upperData[upperData.length - 1].value.toFixed(2)}</div>`;
+                             html += `<div style="color: ${indicatorInfo.series[1].options().color}">${indicatorInfo.series[1].options().title}: ${middleData[middleData.length - 1].value.toFixed(2)}</div>`;
+                             html += `<div style="color: ${indicatorInfo.series[2].options().color}">${indicatorInfo.series[2].options().title}: ${lowerData[lowerData.length - 1].value.toFixed(2)}</div>`;
+                        }
+                     } else { // Single series indicators
+                        if (indicatorInfo.data.length > 0) {
+                             const lastValue = indicatorInfo.data[indicatorInfo.data.length - 1].value;
+                             const s = indicatorInfo.series;
+                             html += `<div style="color: ${s.options().color}">${s.options().title}: ${lastValue.toFixed(2)}</div>`;
+                        }
+                     }
+                }
+            }
+        }
+        // NOTE: We could add similar logic for line/area charts if their data were global.
     }
-    
-    volumeElement.textContent = Math.floor(Math.random() * 10000).toLocaleString();
+
+    legend.innerHTML = html;
 }
 
 // 实时数据模拟
@@ -288,7 +352,7 @@ function startRealtime() {
             
             candleDataGlobal.push(newData);
             candlestickSeries.update(newData);
-            updatePriceInfo(newData);
+            updateLegend();
         }
     }, 1000);
 }
@@ -675,7 +739,7 @@ function addIndicator(type, params = {}) {
                     title: `SMA(${period})`
                 });
                 smaSeries.setData(smaData);
-                indicatorSeries.set(indicatorId, { series: smaSeries, type: type, params: params });
+                indicatorSeries.set(indicatorId, { series: smaSeries, type: type, params: params, data: smaData });
                 activeIndicators.add(indicatorId);
                 break;
 
@@ -688,7 +752,7 @@ function addIndicator(type, params = {}) {
                     title: `EMA(${emaPeriod})`
                 });
                 emaSeries.setData(emaData);
-                indicatorSeries.set(indicatorId, { series: emaSeries, type: type, params: params });
+                indicatorSeries.set(indicatorId, { series: emaSeries, type: type, params: params, data: emaData });
                 activeIndicators.add(indicatorId);
                 break;
 
@@ -713,7 +777,7 @@ function addIndicator(type, params = {}) {
                 });
 
                 rsiSeries.setData(rsiData);
-                indicatorSeries.set(indicatorId, { series: rsiSeries, type: type, params: params });
+                indicatorSeries.set(indicatorId, { series: rsiSeries, type: type, params: params, data: rsiData });
                 activeIndicators.add(indicatorId);
                 break;
 
@@ -749,7 +813,8 @@ function addIndicator(type, params = {}) {
                 indicatorSeries.set(indicatorId, {
                     series: [upperSeries, middleSeries, lowerSeries],
                     type: type,
-                    params: params
+                    params: params,
+                    data: bbData
                 });
                 activeIndicators.add(indicatorId);
                 break;

@@ -121,44 +121,30 @@ body {
     position: relative;
 }
 
+.legend {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    color: #333;
+    pointer-events: none; /* So it doesn't interfere with chart interactions */
+}
+
+.legend div {
+    margin-bottom: 4px;
+}
+
+.legend .value {
+    color: #000;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
 .chart {
     height: 500px;
     width: 100%;
-}
-
-.chart-info {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-}
-
-.current-price {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.price-change {
-    font-size: 0.9rem;
-}
-
-.price-change.positive {
-    color: #26a69a;
-}
-
-.price-change.negative {
-    color: #ef5350;
-}
-
-.volume-info {
-    margin-top: 5px;
-    font-size: 0.8rem;
-    opacity: 0.8;
 }
 
 .features-showcase {
